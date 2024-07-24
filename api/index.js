@@ -10,7 +10,7 @@ const max = (text, target_length = 68, fill_char = "20") => {
 };
 
 const enc = (rok) => {
-    // Replace this with your encryption function
+    // يجب عليك استبدال هذا بـ "التشفير" المناسب إذا لزم الأمر.
     return rok;
 };
 
@@ -28,5 +28,5 @@ module.exports = (req, res) => {
         return res.status(400).json({ error: 'Missing parameters' });
     }
     const result = message(id, text, rok);
-    res.status(200).json({ packet: result });
+    res.status(200).send(result);
 };
