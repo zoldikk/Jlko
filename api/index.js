@@ -44,4 +44,4 @@ export default function handler(req, res) {
 
     // إرجاع النص كاستجابة مباشرة
     res.status(200).send(responseText);
-}
+                }
