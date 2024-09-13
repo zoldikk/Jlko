@@ -1,12 +1,11 @@
 {
-  "name": "my-vercel-api",
+  "name": "my-api",
   "version": "1.0.0",
-  "description": "A simple API to generate packets",
-  "main": "api/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node api/index.js"
+    "start": "node index.js"
   },
-  "author": "Your Name",
-  "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
