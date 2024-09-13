@@ -1,14 +1,11 @@
 import fetch from 'node-fetch';
 
-// Function to shorten URL
+// Function to shorten URLs
 async function shortenUrl(longUrl) {
     const apiUrl = 'https://cleanuri.com/api/v1/shorten';
     const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ url: longUrl })
+        body: new URLSearchParams({ url: longUrl }),
     });
     if (response.ok) {
         const data = await response.json();
@@ -18,9 +15,13 @@ async function shortenUrl(longUrl) {
     }
 }
 
-// Function to decode hex to text
+// Function to decode hex string
 function dec(hexString) {
-    return Buffer.from(hexString, 'hex').toString('latin1');
+    let str = '';
+    for (let i = 0; i < hexString.length; i += 2) {
+        str += String.fromCharCode(parseInt(hexString.substr(i, 2), 16));
+    }
+    return str;
 }
 
 // API handler
@@ -28,38 +29,31 @@ export default async function handler(req, res) {
     const { lop } = req.query;
 
     if (!lop) {
-        return res.status(400).send("The 'lop' parameter is required");
+        return res.status(400).json({ error: "Parameter 'lop' is required" });
     }
 
-    // Define phone options
     const phones = ["iPhone", "Samsung", "redmi", "OnePlus", "Sony", "Huawei"];
     const phone = phones[Math.floor(Math.random() * phones.length)];
-
-    // Decode the provided hex string
     const longText = dec(lop);
+    const id = "في فريق";
 
-    let responseText = "";
+    let responseText = '';
 
     if (longText.includes('google')) {
-        const link = extractLink(longText);
+        const startLink = longText.indexOf('https');
+        const endLink = longText.indexOf('', startLink);
+        const link = longText.substring(startLink, endLink);
         const shortUrl = await shortenUrl(link);
-        responseText = `[b][c]~ المحاكمة:\n[00ffff]حالة لاعب: في فريق\nهاتف لاعب: ${phone}\nربط اساسي: Google\nصورة لاعب: [00ff00]${shortUrl}`;
-    } else if (longText.includes('facebook')) {
-        const link = extractLink(longText);
+        responseText = `[b][c]~ المحاكمة:\n[00ffff]حالة لاعب: ${id}\nهاتف لاعب: ${phone}\nربط اساسي: Google\nصورة لاعب: [00ff00]${shortUrl}`;
+    }
+
+    if (longText.includes('facebook')) {
+        const startLink = longText.indexOf('https');
+        const endLink = longText.indexOf('', startLink);
+        const link = longText.substring(startLink, endLink);
         const shortUrl = await shortenUrl(link);
-        responseText = `[b][c]~ المحاكمة:\n[00ffff]حالة لاعب: في فريق\nهاتف لاعب: ${phone}\nربط اساسي: Facebook\nصورة لاعب: [00ff00]${shortUrl}`;
-    } else {
-        responseText = "[b][c]~ المحاكمة:\n[00ffff]حالة لاعب: في فريق\nهاتف لاعب: ${phone}\nربط اساسي: Unknown\nصورة لاعب: [00ff00]No link found";
+        responseText = `[b][c]~ المحاكمة:\n[00ffff]حالة لاعب: ${id}\nهاتف لاعب: ${phone}\nربط اساسي: Facebook\nصورة لاعب: [00ff00]${shortUrl}`;
     }
 
     res.status(200).send(responseText);
-}
-
-// Extract link from long text
-function extractLink(longText) {
-    const ap = 'https';
-    const dp = '';
-    const startLink = longText.indexOf(ap);
-    const endLink = longText.indexOf(dp, startLink);
-    return longText.substring(startLink, endLink);
-    }
+            }
