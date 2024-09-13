@@ -1,42 +1,47 @@
-// index.js
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 3000;
+export default function handler(req, res) {
+    const { id, lop } = req.query;
 
-// Helper function to convert hex to text
-function hexToText(hexString) {
-    let hex = hexString.toString();
-    let str = '';
-    for (let i = 0; i < hex.length; i += 2) {
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    // التحقق من أن `id` و `lop` قد تم تمريرهما في الرابط
+    if (!id || !lop) {
+        return res.status(400).send("Both 'id' and 'lop' parameters are required");
     }
-    return str;
+
+    // Function to convert hex to text
+    function hexToText(hexString) {
+        let hex = hexString.toString();
+        let str = '';
+        for (let i = 0; i < hex.length; i += 2) {
+            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        }
+        return str;
+    }
+
+    // Function to generate the response text
+    function generateResponse(id, lop) {
+        const phones = ["iPhone", "Samsung", "redmi", "OnePlus", "Sony", "Huawei"];
+        const phone = phones[Math.floor(Math.random() * phones.length)];
+        const longText = hexToText(lop);
+
+        let shortUrl;
+        let nor;
+
+        if (longText.includes('google')) {
+            shortUrl = longText.split('https')[1].split('')[0];
+            nor = "Google";
+        } else if (longText.includes('facebook')) {
+            shortUrl = longText.split('https')[1].split('')[0];
+            nor = "Facebook";
+        } else {
+            shortUrl = "No link found";
+            nor = "Unknown";
+        }
+
+        return `[b][c]~ المحاكمة:\n[00ffff]إيدي لاعب: ${id}\nهاتف لاعب: ${phone}\nربط اساسي: ${nor}\nصورة لاعب: [00ff00]${shortUrl}`;
+    }
+
+    // بناء النص النهائي
+    const responseText = generateResponse(id, lop);
+
+    // إرجاع النص كاستجابة مباشرة
+    res.status(200).send(responseText);
 }
-
-app.get('/api', (req, res) => {
-    const { lop, id } = req.query;
-
-    if (!lop || !id) {
-        return res.status(400).json({ error: "Both 'lop' and 'id' parameters are required" });
-    }
-
-    const phones = ["iPhone", "Samsung", "redmi", "OnePlus", "Sony", "Huawei"];
-    const phone = phones[Math.floor(Math.random() * phones.length)];
-    const longText = hexToText(lop);
-
-    let result = "No relevant links found.";
-
-    if (longText.includes('google')) {
-        const link = longText.substring(longText.indexOf('https'), longText.indexOf(''));
-        result = `[b][c]~ المحاكمة:\n[00ffff]إيدي لاعب: ${id}\nهاتف لاعب: ${phone}\nربط اساسي: Google\nصورة لاعب: [00ff00]${link}`;
-    } else if (longText.includes('facebook')) {
-        const link = longText.substring(longText.indexOf('https'), longText.indexOf(''));
-        result = `[b][c]~ المحاكمة:\n[00ffff]إيدي لاعب: ${id}\nهاتف لاعب: ${phone}\nربط اساسي: Facebook\nصورة لاعب: [00ff00]${link}`;
-    }
-
-    res.status(200).json({ result });
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
