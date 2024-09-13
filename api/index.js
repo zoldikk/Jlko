@@ -26,14 +26,19 @@ export default function handler(req, res) {
         let nor;
 
         if (longText.includes('google')) {
-            shortUrl = longText.split('https')[1].split('')[0];
+            shortUrl = longText.split('https')[1]?.split('')[0];
             nor = "Google";
         } else if (longText.includes('facebook')) {
-            shortUrl = longText.split('https')[1].split('')[0];
+            shortUrl = longText.split('https')[1]?.split('')[0];
             nor = "Facebook";
         } else {
             shortUrl = "No link found";
             nor = "Unknown";
+        }
+
+        // Ensure the URL starts with 'https://'
+        if (!shortUrl.startsWith('https://')) {
+            shortUrl = 'https://' + shortUrl;
         }
 
         return `[b][c]~ المحاكمة:\n[00ffff]إيدي لاعب: ${id}\nهاتف لاعب: ${phone}\nربط اساسي: ${nor}\nصورة لاعب: [00ff00]${shortUrl}`;
@@ -44,4 +49,4 @@ export default function handler(req, res) {
 
     // إرجاع النص كاستجابة مباشرة
     res.status(200).send(responseText);
-                }
+            }
